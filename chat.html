@@ -3,52 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alexa-style Chatbot</title>
+  <title>Simple Chatbot</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f4f6f8;
-    }
-
-    #chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #7b61ff, #5c2d91);
-      border: none;
-      border-radius: 50%;
-      width: 64px;
-      height: 64px;
       display: flex;
-      align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      transition: background 0.3s ease;
-      z-index: 9999;
-    }
-
-    #chat-toggle:hover {
-      background: linear-gradient(135deg, #5c2d91, #4a1c78);
-      transform: scale(1.05);
+      align-items: center;
+      height: 100vh;
     }
 
     .chatbox {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 360px;
-      max-height: 520px;
+      width: 400px;
+      max-height: 600px;
       background: #ffffff;
       border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-      display: none;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
       flex-direction: column;
       overflow: hidden;
-      z-index: 9999;
-      transition: all 0.3s ease-in-out;
     }
 
     .messages {
@@ -64,7 +40,6 @@
     .message {
       display: flex;
       align-items: flex-end;
-      animation: fadeIn 0.3s ease-in-out;
       max-width: 85%;
     }
 
@@ -81,11 +56,10 @@
       padding: 12px 16px;
       border-radius: 20px;
       line-height: 1.5;
-      position: relative;
       font-size: 15px;
       white-space: pre-wrap;
       max-width: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .user .bubble {
@@ -105,7 +79,6 @@
       height: 36px;
       border-radius: 50%;
       margin: 0 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
     form {
@@ -145,11 +118,6 @@
       animation: pulse 1.5s infinite;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     @keyframes pulse {
       0% { opacity: 0.3; }
       50% { opacity: 1; }
@@ -159,15 +127,7 @@
 </head>
 <body>
 
-<!-- Floating Message Bubble Button -->
-<button id="chat-toggle" aria-label="Open chat">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="28" height="28">
-    <path d="M2 21l1.5-4.5C2.5 15 2 13.5 2 12c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10c-1.5 0-3-.5-4.5-1.5L2 21z"/>
-  </svg>
-</button>
-
-<!-- Chat Window -->
-<div class="chatbox" id="chatbox">
+<div class="chatbox">
   <div class="messages" id="messages"></div>
   <form id="chat-form">
     <input type="text" id="user-input" placeholder="Type your message..." required />
@@ -176,25 +136,18 @@
 </div>
 
 <script>
-  const API_URL = "https://gsa1nq4ize.execute-api.eu-west-1.amazonaws.com/qa/chatbot-ai";
+  const API_URL = "https://m6btv3wxjj.execute-api.eu-west-1.amazonaws.com/qa/bota-ai";
 
-  const toggleButton = document.getElementById("chat-toggle");
-  const chatbox = document.getElementById("chatbox");
   const form = document.getElementById("chat-form");
   const input = document.getElementById("user-input");
   const messages = document.getElementById("messages");
 
-  toggleButton.addEventListener("click", () => {
-    chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
-    chatbox.style.flexDirection = "column";
-  });
-
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const question = input.value.trim();
-    if (!question) return;
+    const query = input.value.trim();
+    if (!query) return;
 
-    addMessage("user", question);
+    addMessage("user", query);
     input.value = "";
 
     const typingEl = showTypingIndicator();
@@ -203,27 +156,15 @@
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question })  // sending "question" as key
+        body: JSON.stringify({ question: query })
       });
 
-      let data = await response.json();
-      console.log("Raw API response:", data); // debug log
-
+      const raw = await response.json();
+      const data = typeof raw.body === "string" ? JSON.parse(raw.body) : raw;
       removeTypingIndicator(typingEl);
 
-      // If API Gateway or Lambda returns a wrapped response
-      if (typeof data.body === "string") {
-        try {
-          data = JSON.parse(data.body);
-        } catch (e) {
-          addMessage("bot", "⚠️ Failed to parse response body.");
-          return;
-        }
-      }
-
-      if (data.message) {
-        const formatted = formatMessage(data.message.trim());
-        addMessage("bot", formatted, true);
+      if (data.answer) {
+        addMessage("bot", data.answer.trim());
       } else if (data.error) {
         addMessage("bot", `⚠️ Error: ${data.error}`);
       } else {
@@ -235,7 +176,7 @@
     }
   });
 
-  function addMessage(sender, text, isHTML = false) {
+  function addMessage(sender, text) {
     const msg = document.createElement("div");
     msg.className = `message ${sender}`;
 
@@ -247,11 +188,7 @@
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    if (isHTML) {
-      bubble.innerHTML = text;
-    } else {
-      bubble.textContent = text;
-    }
+    bubble.textContent = text;
 
     msg.appendChild(avatar);
     msg.appendChild(bubble);
@@ -272,15 +209,6 @@
     if (el && el.parentNode) {
       el.parentNode.removeChild(el);
     }
-  }
-
-  function formatMessage(raw) {
-    let formatted = raw
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/(\d+)\.\s(.*?)(?=(\d+\.|$))/gs, (_, num, content) => {
-        return `<div style="margin-bottom: 6px;"><strong>${num}.</strong> ${content.trim()}</div>`;
-      });
-    return formatted;
   }
 </script>
 
