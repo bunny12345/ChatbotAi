@@ -166,7 +166,6 @@
   </svg>
 </button>
 
-
 <!-- Chat Window -->
 <div class="chatbox" id="chatbox">
   <div class="messages" id="messages"></div>
@@ -175,8 +174,6 @@
     <button type="submit">Send</button>
   </form>
 </div>
-
-<!-- ... (all other parts remain unchanged) -->
 
 <script>
   const API_URL = "https://gsa1nq4ize.execute-api.eu-west-1.amazonaws.com/qa/chatbot-ai";
@@ -194,10 +191,10 @@
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const query = input.value.trim();
-    if (!query) return;
+    const question = input.value.trim();
+    if (!question) return;
 
-    addMessage("user", query);
+    addMessage("user", question);
     input.value = "";
 
     const typingEl = showTypingIndicator();
@@ -206,11 +203,23 @@
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: query })  // ✅ Updated here
+        body: JSON.stringify({ question })  // sending "question" as key
       });
 
-      const data = await response.json();
+      let data = await response.json();
+      console.log("Raw API response:", data); // debug log
+
       removeTypingIndicator(typingEl);
+
+      // If API Gateway or Lambda returns a wrapped response
+      if (typeof data.body === "string") {
+        try {
+          data = JSON.parse(data.body);
+        } catch (e) {
+          addMessage("bot", "⚠️ Failed to parse response body.");
+          return;
+        }
+      }
 
       if (data.message) {
         const formatted = formatMessage(data.message.trim());
@@ -274,5 +283,6 @@
     return formatted;
   }
 </script>
+
 </body>
 </html>
