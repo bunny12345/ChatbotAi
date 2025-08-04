@@ -176,6 +176,8 @@
   </form>
 </div>
 
+<!-- ... (all other parts remain unchanged) -->
+
 <script>
   const API_URL = "https://gsa1nq4ize.execute-api.eu-west-1.amazonaws.com/qa/chatbot-ai";
 
@@ -204,7 +206,7 @@
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ question: query })  // ✅ Updated here
       });
 
       const data = await response.json();
@@ -272,7 +274,3 @@
     return formatted;
   }
 </script>
-
-</body>
-
-</html>
