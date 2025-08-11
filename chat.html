@@ -29,12 +29,8 @@
       border-radius: 10px;
       box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
     }
-    h2 {
-      color: #1f2937;
-    }
-    ul {
-      margin-left: 20px;
-    }
+    h2 { color: #1f2937; }
+    ul { margin-left: 20px; }
     footer {
       background: #1f2937;
       color: white;
@@ -87,6 +83,27 @@
       flex: 1;
       padding: 10px;
       overflow-y: auto;
+      background: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 12px;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+    .user-message {
+      background: #d1e7ff;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .bot-message {
+      background: #e5e7eb;
+      align-self: flex-start;
+      margin-right: auto;
     }
     #chatbot-input {
       display: flex;
@@ -115,7 +132,7 @@
 
 <div class="container">
   <h2>Project Overview</h2>
-  <p>I designed and deployed a fully functional AI-powered website chatbot capable of answering domain-specific questions with high accuracy and speed. This is a sample bot that answers your queries related to institutions in Ireland</p>
+  <p>I designed and deployed a fully functional AI-powered website chatbot capable of answering domain-specific questions with high accuracy and speed. This is a sample bot that helps to answer your queries related to institutions and their programs</p>
 
   <h2>Key Features</h2>
   <ul>
@@ -162,8 +179,16 @@
   const userInput = document.getElementById('user-input');
   const chatbotBody = document.getElementById('chatbot-body');
 
+  let initialMessageSent = false;
+
   chatbotBubble.addEventListener('click', () => {
-    chatbotPopup.style.display = chatbotPopup.style.display === 'flex' ? 'none' : 'flex';
+    const isOpen = chatbotPopup.style.display === 'flex';
+    chatbotPopup.style.display = isOpen ? 'none' : 'flex';
+
+    if (!isOpen && !initialMessageSent) {
+      appendMessage('bot', 'Hey, how can I help you today?');
+      initialMessageSent = true;
+    }
   });
 
   sendBtn.addEventListener('click', sendMessage);
@@ -194,8 +219,8 @@
 
   function appendMessage(sender, text) {
     const msgDiv = document.createElement('div');
-    msgDiv.style.margin = '8px 0';
-    msgDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${text}`;
+    msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+    msgDiv.innerHTML = text;
     chatbotBody.appendChild(msgDiv);
     chatbotBody.scrollTop = chatbotBody.scrollHeight;
   }
