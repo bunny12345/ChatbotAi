@@ -171,13 +171,13 @@
 </button>
 
 <!-- Chatbot popup -->
-<section id="chatbot-popup" role="dialog" aria-label="Chat with Herbie" aria-modal="false">
+<section id="chatbot-popup" role="dialog" aria-label="Chat with Vista" aria-modal="false">
   <div id="chatbot-header">
     <div class="bot-avatar" aria-hidden="true">
       <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v1h1a3 3 0 0 1 3 3v3a7 7 0 1 1-14 0V9a3 3 0 0 1 3-3h1V5a3 3 0 0 1 3-3zm-4 9h2v2H8v-2zm8 0h-2v2h2v-2z"/></svg>
     </div>
     <div>
-      <div class="bot-title">Herbie</div>
+      <div class="bot-title">Vista</div>
       <div class="bot-sub">Dublin Colleges Assistant</div>
     </div>
   </div>
@@ -238,7 +238,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v4a8 8 0 1 1-16 0V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3z"/></svg>
         </div>
         <div class="intro-text">
-          <h4>Hello! I’m Herbie.</h4>
+          <h4>Hello! I’m Vista.</h4>
           <p>I answer questions about <strong>Dublin colleges</strong>—courses, tuition fees, scholarships, and admissions. Pick a topic or ask anything below.</p>
         </div>
       </div>
@@ -332,18 +332,18 @@
     scrollToBottom();
   }
 
-  function appendHomeBack(){
-    // Compact “Back to main menu” bar
-    const box = document.createElement('div');
-    box.style.marginTop = '6px';
-    box.innerHTML = `<button class="btn btn-primary" style="width:100%">Back to main menu</button>`;
-    chatbotBody.appendChild(box);
-    box.querySelector('button').addEventListener('click', ()=>{
-      appendBubble('bot', `Back to main menu.`, 'note');
-      showHomeMenu();
-    });
-    scrollToBottom();
-  }
+  // function appendHomeBack(){
+  //   // Compact “Back to main menu” bar
+  //   const box = document.createElement('div');
+  //   box.style.marginTop = '6px';
+  //   box.innerHTML = `<button class="btn btn-primary" style="width:100%">Back to main menu</button>`;
+  //   chatbotBody.appendChild(box);
+  //   box.querySelector('button').addEventListener('click', ()=>{
+  //     appendBubble('bot', `Back to main menu.`, 'note');
+  //     showHomeMenu();
+  //   });
+  //   scrollToBottom();
+  // }
 
   function appendTyping(){
     const id = 'typing-' + Math.random().toString(36).slice(2);
@@ -372,3 +372,4 @@
 
 </body>
 </html>
+
